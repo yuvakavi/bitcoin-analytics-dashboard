@@ -4,6 +4,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime
 import numpy as np
+import os
 
 # Page configuration
 st.set_page_config(
@@ -206,7 +207,23 @@ st.markdown("""
 # Load data
 @st.cache_data
 def load_data():
-    df = pd.read_csv(r'c:\Users\Yuva sri\Downloads\btc_extended.csv')
+    import os
+    # Try multiple possible paths
+    possible_paths = [
+        r'c:\Users\Yuva sri\Downloads\btc_extended.csv',
+        'btc_extended.csv',
+        os.path.join(os.path.dirname(__file__), 'btc_extended.csv')
+    ]
+    
+    df = None
+    for path in possible_paths:
+        if os.path.exists(path):
+            df = pd.read_csv(path)
+            break
+    
+    if df is None:
+        raise FileNotFoundError("btc_extended.csv not found in any expected location")
+    
     df['date'] = pd.to_datetime(df['date'], format='%d-%m-%Y %H:%M')
     df = df.sort_values('date')
     
